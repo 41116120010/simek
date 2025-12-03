@@ -1,5 +1,5 @@
 SIMEK (Sistem Manajemen Event Kampus) adalah Aplikasi berbasis Web yang saya buat untuk membantu Organisasi Kampus mengatur berbagai Event, mulai dari Lomba hingga Seminar.
-Project ini masih dalam Tahap Pengembangan dan astinya terdapat Kekurangan. Maka dari itu akan terus Saya Kembangkan secara bertahap hingga Final Release.
+Project ini masih dalam Tahap Pengembangan yang pastinya terdapat Kekurangan, dan akan Saya Kembangkan secara bertahap hingga Final Release.
 
 ## Fitur Utama
 Beberapa fitur yang sudah ada, antara lain :
@@ -14,11 +14,11 @@ Beberapa fitur yang sudah ada, antara lain :
   - Data Peserta tersimpan Rapi di Database.
   - Tersedia Validasi Data Dasar (nama, kontak, dst.)
 
-- **Pembayaran (Work in Progress)**
+- **Pembayaran (Sedang Saya Kerjakan)**
   - Rencana integrasi Pembayaran Online via **Tripay atau Midtrans**
   - Targetnya, kalau pembayaran sudah valid maka pendaftaran otomatis terkonfirmasi.
 
-- **Notifikasi (Planned)**
+- **Notifikasi (Direncanakan)**
   - Notifikasi via WhatsApp / e-mail untuk :
     - Status Pembayaran.
     - Pengingat Jadwal Event.
@@ -34,4 +34,4 @@ Project ini dibangun dengan :
 - **Frontend** : Blade + TailAdmin (Tailwind CSS v4)
 - **Database** : MySQL / MariaDB
 - **Bundler** : Vite
-- **Pembayaran** : Tripay/Midtrans (On Progress)
+- **Pembayaran** : Tripay/Midtrans
