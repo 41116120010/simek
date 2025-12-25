@@ -135,6 +135,7 @@ Route::middleware(['auth', 'verified', 'role:participant'])->prefix('participant
     Route::post('registrations/store/{event}', [\App\Http\Controllers\Participant\RegistrationController::class, 'store'])->name('registrations.store');
     Route::get('registrations/{registration}', [\App\Http\Controllers\Participant\RegistrationController::class, 'show'])->name('registrations.show');
     Route::get('registrations/{registration}/payment', [\App\Http\Controllers\Participant\RegistrationController::class, 'payment'])->name('registrations.payment');
+    Route::post('registrations/{registration}/checkout', [\App\Http\Controllers\Participant\RegistrationController::class, 'checkout'])->name('registrations.checkout');
 });
 
 require __DIR__.'/auth.php';
