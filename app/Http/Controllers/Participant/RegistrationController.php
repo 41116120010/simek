@@ -10,10 +10,17 @@ use App\Models\Payment;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\TripayService;
 
 class RegistrationController extends Controller
 {
     use ActivityLogger;
+    
+    protected $tripayService;
+    public function __construct(TripayService $tripayService)
+    {
+        $this->tripayService = $tripayService;
+    }
 
     /**
      * Display user's registrations.
@@ -221,8 +228,82 @@ class RegistrationController extends Controller
                 ->with('info', 'Event ini gratis, tidak memerlukan pembayaran.');
         }
 
+        // Cek jika status sudah paid, jangan kasih bayar lagi
+        if ($registration->payment && $registration->payment->status === 'paid') {
+             return redirect()->route('participant.registrations.show', $registration)
+                ->with('success', 'Pembayaran sudah lunas.');
+        }
+
         $registration->load(['event', 'payment']);
 
-        return view('participant.registrations.payment', compact('registration'));
+        // AMBIL DATA CHANNEL DARI TRIPAY
+        try {
+            $channels = $this->tripayService->getPaymentChannels();
+        } catch (\Exception $e) {
+            $channels = []; // Default kosong kalau API error
+        }
+
+        // Kirim $channels ke view
+        return view('participant.registrations.payment', compact('registration', 'channels'));
+    }
+    
+    public function checkout(Request $request, Registration $registration)
+    {
+        // 1. Validasi Input
+        $request->validate([
+            'method' => 'required', // User wajib pilih metode (misal: QRIS, BNI, dll)
+        ]);
+
+        // 2. Ambil data payment local
+        $payment = $registration->payment;
+        
+        if ($payment->payment_method === $request->method && 
+            $payment->status === 'unpaid' && 
+            $payment->checkout_url && 
+            $payment->expired_at > now()) {
+            
+            // Langsung redirect ke URL lama tanpa nembak API Tripay lagi
+            return redirect($payment->checkout_url);
+        }
+
+        // 3. Siapkan Data untuk TriPay
+        // Kita hitung total amount lagi untuk keamanan
+        $amount = (int) $payment->total_amount;
+        
+        $data = [
+            'method'         => $request->method,
+            'merchant_ref'   => $payment->merchant_ref,
+            'amount'         => $amount,
+            'customer_name'  => auth()->user()->name,
+            'customer_email' => auth()->user()->email,
+            'customer_phone' => auth()->user()->phone ?? '08123456789',
+            'order_items'    => [
+                [
+                    'sku'      => 'EVT-' . $registration->event->id,
+                    'name'     => 'Tiket: ' . $registration->event->name,
+                    'price'    => $amount,
+                    'quantity' => 1
+                ]
+            ],
+            'registration_id' => $registration->id 
+        ];
+
+        try {
+            $tripayTransaction = $this->tripayService->createTransaction($data);
+
+            $payment->update([
+                'reference'      => $tripayTransaction['data']['reference'],
+                'payment_method' => $request->method,
+                'checkout_url'   => $tripayTransaction['data']['checkout_url'],
+                'status'         => 'unpaid',
+                // Kita update expired_at sesuai data baru dari Tripay (Unix Timestamp)
+                'expired_at'     => \Carbon\Carbon::createFromTimestamp($tripayTransaction['data']['expired_time']),
+            ]);
+
+            return redirect($tripayTransaction['data']['checkout_url']);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memproses pembayaran: ' . $e->getMessage());
+        }
     }
 }
