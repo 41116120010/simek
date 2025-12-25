@@ -14,11 +14,11 @@ Beberapa fitur yang sudah ada, antara lain :
   - Data Peserta tersimpan Rapi di Database.
   - Tersedia Validasi Data Dasar (nama, kontak, dst.)
 
-- **Pembayaran (Sedang Saya Kerjakan)**
-  - Rencana integrasi Pembayaran Online via **Tripay atau Midtrans**
-  - Targetnya, kalau pembayaran sudah valid maka pendaftaran otomatis terkonfirmasi.
+- **Pembayaran**
+  - Rencana integrasi Pembayaran Online via **Tripay**
+  - kalau pembayaran sudah valid maka pendaftaran otomatis terkonfirmasi.
 
-- **Notifikasi (Direncanakan)**
+- **Notifikasi (Sedang saya kerjakan)**
   - Notifikasi via WhatsApp / e-mail untuk :
     - Status Pembayaran.
     - Pengingat Jadwal Event.
@@ -34,4 +34,4 @@ Project ini dibangun dengan :
 - **Frontend** : Blade + TailAdmin (Tailwind CSS v4)
 - **Database** : MySQL / MariaDB
 - **Bundler** : Vite
-- **Pembayaran** : Tripay/Midtrans
+- **Pembayaran** : Tripay
